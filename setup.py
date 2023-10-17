@@ -1,34 +1,55 @@
-import numpy as np
+# copyright ################################# #
+# This file is part of the Xfields Package.   #
+# Copyright (c) CERN, 2021.                   #
+# ########################################### #
 
-from setuptools import setup, Extension
+from setuptools import setup, find_packages, Extension
+from pathlib import Path
 
-from Cython.Distutils import build_ext
-from Cython.Build import cythonize
+#######################################
+# Prepare list of compiled extensions #
+#######################################
+
+extensions = []
 
 
-cy_ext_options = {"compiler_directives": {"profile": True}, "annotate": True}
-cy_ext = [
-    Extension(
-        "CyFPPS",
-        sources=[ # the Cython source and additional C++ source files generate and compile C++ code
-            'FPPS/CyFPPS.pyx', 'FPPS/FPPSWrapper.cc',
-            'FPPS/ChangeCoord.cc', 'FPPS/ElectricFieldSolver.cc', 'FPPS/Mesh.cc',
-        'FPPS/ChangeCoord_Frac.cc', 'FPPS/FastPolarPoissonSolver.cc',  'FPPS/NonLinearMesh.cc',
-        'FPPS/ChangeCoord_Tanh.cc', 'FPPS/PolarBeamRepresentation.cc',
-        'FPPS/ChargeDistribution.cc', 'FPPS/FunctionsFPPS.cc'],
-        language="c++", include_dirs=[np.get_include()], libraries=['fftw3', 'm'])
-]
+#########
+# Setup #
+#########
 
+version_file = Path(__file__).parent / 'xfields/_version.py'
+dd = {}
+with open(version_file.absolute(), 'r') as fp:
+    exec(fp.read(), dd)
+__version__ = dd['__version__']
 
 setup(
-    name='PyPIC',
-    description='Collection of Python Particle-In-Cell solvers.',
-    url='http://github.com/PyCOMPLETE/PyPIC',
-    packages=['PyPIC'],
-    cmdclass={'build_ext': build_ext},
-    ext_modules=cythonize(cy_ext, **cy_ext_options),
+    name='xfields',
+    version=__version__,
+    description='Field Maps and Particle In Cell',
+    long_description=("Python package for the computation of fields generated "
+                      "by particle ensembles in accelerators.\n\n"
+                      "This package is part of the Xsuite collection."),
+    url='https://xsuite.readthedocs.io/',
+    packages=find_packages(),
+    ext_modules = extensions,
+    include_package_data=True,
     install_requires=[
-        'numpy',
-        'cython'
-    ]
-)
+        'numpy>=1.0',
+        'scipy',
+        'pandas',
+        'xobjects>=0.0.4',
+        'xtrack>=0.0.1',
+        ],
+    author='G. Iadarola et al.',
+    license='Apache 2.0',
+    download_url="https://pypi.python.org/pypi/xfields",
+    project_urls={
+            "Bug Tracker": "https://github.com/xsuite/xsuite/issues",
+            "Documentation": 'https://xsuite.readthedocs.io/',
+            "Source Code": "https://github.com/xsuite/xfields",
+        },
+    extras_require={
+            'tests': ['pytest'],
+        },
+    )

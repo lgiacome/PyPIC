@@ -1,3 +1,5 @@
+*.DS_Store
+*.swp
 *.so
 *.pyc
 .project
@@ -7,3 +9,5 @@ norepository_*
 *~
 build
 CyFPPS.cpp
+*.egg-info
+.idea/**
